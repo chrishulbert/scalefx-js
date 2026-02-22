@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ScaleFX pixel art upscaler</title>
+</head>
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+    }
+    html {
+        background: #000;
+        color: #fff;
+        padding: 1rem;
+    }
+    h1 {
+        text-align: center;
+    }
+    div {
+        margin-top: 1rem;
+    }
+    #drop-zone {
+        border: 1px dashed;
+        border-radius: 1rem;
+        padding: 2rem;
+        text-align: center;
+    }
+    #drop-zone.drag-over {
+        color: magenta;
+        border-color: magenta;
+    }
+    #output p {
+        margin-bottom: 1rem;
+    }
+    #output button {
+        display: block;
+        margin-bottom: 1rem;
+    }
+    #file-name {
+        margin-bottom: 1rem;
+    }
+    .github {
+        width: 100%;
+        text-align: center;
+        display: block;
+        color: white;
+    }
+</style>
+<body>
+
+    <h1>ScaleFX pixel art upscaler</h1>
+
+    <div id="drop-zone">
+        <p>Drop a small PNG here. 16-colour pixel art works best.</p>
+    </div>
+
+    <div id="info">
+        <p id="file-name"></p>
+        <p id="dims"></p>
+    </div>
+
+    <div id="output">
+    </div>
+
+    <div>
+        <a class="github" href="https://github.com/chrishulbert/scalefx-rs#examples">See examples here: github.com/chrishulbert/scalefx-rs</a>
+    </div>
+</body>
+<script type="module">
+
+import * as ScaleFX from './scalefx.mjs';
+
+const dropZone = document.getElementById('drop-zone');
+dropZone.addEventListener('dragover', e => {
+    e.preventDefault();
+    dropZone.classList.add('drag-over');
+});
+dropZone.addEventListener('dragleave', () => {
+    dropZone.classList.remove('drag-over');
+});
+dropZone.addEventListener('drop', e => {
+    e.preventDefault();
+    dropZone.classList.remove('drag-over');
+    const file = e.dataTransfer.files[0];
+    if (file && file.type === 'image/png') {
+        loadImage(file);
+    } else {
+        alert('Please drop a PNG file.');
+    }
+});
+function loadImage(file) {
+    const dims = document.getElementById('dims');
+    const fileName = document.getElementById('file-name');
+    fileName.textContent = file.name;
+    dims.textContent = 'Loading and scaling...';
+
+    // Load the file into an Image.
+    const url = URL.createObjectURL(file);
+    const img = new Image();
+    img.onload = () => {
+        dims.textContent = `Input: ${img.naturalWidth} × ${img.naturalHeight}`;
+
+        // Render to a canvas temporarily to get the data.
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = img.naturalWidth;
+        canvas.height = img.naturalHeight;
+        ctx.drawImage(img, 0, 0);
+        const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+        const sfxImage = extractSfxImage(imageData);
+        URL.revokeObjectURL(url);
+
+        // Scale it now we have extracted the data:
+        const scaled = scale(sfxImage);
+    };
+    img.onerror = () => alert('Could not load image.');
+    img.src = url;
+}
+
+// Extracts an image from a canvas image to a format we can send to scalefx.
+function extractSfxImage(imageData) {
+    const d = imageData.data; // Uint8ClampedArray
+    const w = imageData.width;
+    const h = imageData.height;
+    const len = w*h;
+    const p = new Uint32Array(len);
+    let i=0; // Index into the u32's.
+    let j=0; // Index into the u8's.
+    for (let k=0; k<len; k++) {
+        const r = d[j++];
+        const g = d[j++];
+        const b = d[j++];
+        const a = d[j++];
+        const z = ((r << 24) | (g << 16) | (b << 8) | a) >>> 0; // >>> 0 treats it as unsigned.
+        p[i++] = z;
+    }
+    return { width: w, height: h, pixels: p}
+}
+
+function scale(sfxImage) {
+    const big = ScaleFX.scale3x(sfxImage);
+    const bigger = ScaleFX.scale3x(big);
+    display(bigger);
+}
+
+function display(sfxImage) {
+    const canvas = document.createElement('canvas');
+    canvas.width = sfxImage.width;
+    canvas.height = sfxImage.height;
+    const ctx = canvas.getContext('2d');
+    const p = new Uint8ClampedArray(sfxImage.width * sfxImage.height * 4);
+    let i=0;
+    for (const x of sfxImage.pixels) {
+        p[i++] = x >>> 24;
+        p[i++] = (x >>> 16) & 0xff;
+        p[i++] = (x >>> 8) & 0xff;
+        p[i++] = x & 0xff;
+    }
+    const imageData = new ImageData(p, sfxImage.width, sfxImage.height);
+    ctx.putImageData(imageData, 0, 0);
+
+    const text = document.createElement('p');
+    text.textContent = `Output: ${sfxImage.width} × ${sfxImage.height}`
+
+    const download = document.createElement('button');
+    download.textContent = 'Download PNG';
+    download.onclick = downloadImage;
+
+    document.getElementById('output').replaceChildren(text, download, canvas);
+}
+
+function downloadImage() {
+    const canvas = document.getElementsByTagName('canvas')[0];
+    const link = document.createElement('a');
+    link.download = 'scalefx.png';
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+}
+
+</script>
+</html>
