@@ -24,4 +24,5 @@ Simply copy `scalefx.mts` (or if you can't use Typescript, use `scalefx.mjs`) in
 
 ## References
 
-* https://docs.libretro.com/development/shader/slang-shaders/#pragma-parameter
+* https://github.com/libretro/slang-shaders/tree/master/edge-smoothing/scalefx/shaders
+* https://github.com/chrishulbert/scalefx-rs
