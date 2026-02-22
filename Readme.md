@@ -18,7 +18,7 @@ Simply run `make run`. It'll run `index.mts` which will upscale an image and ren
 
 ## How to use this in your code
 
-Simply copy `scalefx.mts` (or if you can't use Typescript, use `scalefx.mjs`) into your project, and call `ScaleFX.scale3x(sfxImage)`, where sfxImage has width, height, and pixels being a Uint32Array of 0xRRGGBBAA pixels. See the web folder for an example!
+Simply copy `scalefx.mts` (or if you can't use Typescript, use `scalefx.mjs`) into your project, and call `ScaleFX.scale3x(sfxImage)`, where sfxImage has width, height, and pixels being a Uint32Array of 0xRRGGBBAA pixels. See `docs/index.html` folder for an example!
 
 ## References
 
