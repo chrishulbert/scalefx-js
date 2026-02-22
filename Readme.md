@@ -6,7 +6,7 @@ ScaleFX pixel art upcaler, on the CPU (not a shader!), in Javascript / Typescrip
 
 ![Blooguard](https://github.com/chrishulbert/cpu-scalefx-rs/raw/main/readme/Blooguard.big.png)
 
-This is a Typescript port of my Rust port of the original shader, thanks to Sp00kyFox, 2016.
+This is a Typescript port of my Rust port of the original shader, thanks to Sp00kyFox, 2016. There's also a Javascript port here too, it's ports all the way down!
 
 Please check out the Rust version here: [github.com/chrishulbert/scalefx-rs](https://github.com/chrishulbert/scalefx-rs).
 
