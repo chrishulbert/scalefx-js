@@ -2,6 +2,8 @@
 
 ScaleFX pixel art upcaler, on the CPU (not a shader!), in Javascript / Typescript.
 
+[Take it for a spin in your browser](https://chrishulbert.github.io/scalefx-js/)!
+
 ![Blooguard](https://github.com/chrishulbert/cpu-scalefx-rs/raw/main/readme/Blooguard.png)
 
 ![Blooguard](https://github.com/chrishulbert/cpu-scalefx-rs/raw/main/readme/Blooguard.big.png)
