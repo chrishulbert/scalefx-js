@@ -10,6 +10,12 @@ This is a Typescript port of my Rust port of the original shader, thanks to Sp00
 
 Please check out the Rust version here: [github.com/chrishulbert/scalefx-rs](https://github.com/chrishulbert/scalefx-rs).
 
+## How to give it a try
+
+Prerequisite: Have `pnpm` installed. It's a more secure version of `npm`.
+
+Simply run `make run`. It'll run `index.mts` which will upscale an image and render it to the terminal using ANSI colour codes.
+
 ## How to use this in your code
 
 Simply copy `scalefx.mts` (or if you can't use Typescript, use `scalefx.mjs`) into your project, and call `ScaleFX.scale3x(sfxImage)`, where sfxImage has width, height, and pixels being a Uint32Array of 0xRRGGBBAA pixels. See the web folder for an example!
